@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel narrow"><h1>Connect to {{ inv.client }}</h1>
+<p>{{ inv.client }} has invited <strong>{{ inv.supplier_name }}</strong>. Your company, <strong>{{ user.supplier.name }}</strong>, is already registered, so you do not need to enter its details again.</p>
+<p>After connecting, you choose which products and source locations {{ inv.client }} can see. Nothing is shared automatically with other customers.</p>
+<form method="post">{% csrf_token %}<div class="actions"><button class="btn" type="submit">Connect {{ user.supplier.name }}</button><a class="btn btn-secondary" href="{% url 'core:dashboard' %}">Not now</a></div></form></div>
+{% endblock %}

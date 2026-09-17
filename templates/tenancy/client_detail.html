@@ -1,0 +1,34 @@
+{% extends "base.html" %}{% load gateway %}
+{% block content %}
+<nav class="crumbs" aria-label="Breadcrumb">{% if user.is_sz_admin %}<a href="{% url 'tenancy:client_list' %}">Clients</a> / {% endif %}{{ client.name }}</nav>
+<div class="page-head"><h1>{{ client.name }}</h1>{% if can_manage %}<div class="btn-row"><a class="btn btn-secondary" href="{% url 'tenancy:client_edit' client.pk %}">Edit details</a><a class="btn btn-secondary" href="{% url 'tenancy:entity_create' client.pk %}">Add legal entity</a><a class="btn" href="{% url 'tenancy:supplier_invite' client.pk %}">Invite supplier</a></div>{% endif %}</div>
+<dl class="facts">
+  <div><dt>Status</dt><dd><span class="status status-{{ client.status }}">{{ client.get_status_display }}</span></dd></div>
+  <div><dt>Trading name</dt><dd>{{ client.trading_name|dash }}</dd></div>
+  <div><dt>Country</dt><dd>{{ client.country|country_name }}</dd></div>
+  <div><dt>Registration no.</dt><dd>{{ client.registration_number|dash }}</dd></div>
+  <div><dt>VAT</dt><dd>{{ client.vat_number|dash }}</dd></div>
+  <div><dt>EORI</dt><dd>{{ client.eori_number|dash }}</dd></div>
+  <div><dt>Size</dt><dd>{{ client.get_company_size_display|dash }}</dd></div>
+  <div><dt>Main contact</dt><dd>{{ client.main_contact_name }}<br><small>{{ client.main_contact_email }}</small></dd></div>
+  <div><dt>EUDR contact</dt><dd>{{ client.eudr_contact_name|dash }}{% if client.eudr_contact_email %}<br><small>{{ client.eudr_contact_email }}</small>{% endif %}</dd></div>
+  <div class="wide"><dt>Address</dt><dd>{{ client.address|linebreaksbr }}</dd></div>
+</dl>
+<h2>Legal entities</h2>
+<div class="table-wrap"><table><thead><tr><th>Entity</th><th>Country</th><th>EUDR role</th><th>EORI</th><th>TRACES reference</th><th>Active</th></tr></thead><tbody>
+{% for e in entities %}<tr><td><a href="{% url 'tenancy:entity_detail' e.pk %}">{{ e.name }}</a></td><td>{{ e.country|country_name }}</td><td>{{ e.get_eudr_role_display }}</td><td>{{ e.eori_number|dash }}</td><td>{{ e.traces_operator_reference|dash }}</td><td>{{ e.is_active|yesno:"Yes,No" }}</td></tr>
+{% empty %}<tr><td colspan="6" class="empty">No legal entities yet.</td></tr>{% endfor %}</tbody></table></div>
+<h2>Suppliers</h2>
+<div class="table-wrap"><table><thead><tr><th>Supplier</th><th>Country</th><th>Entities</th><th>Relationship</th><th>Since</th></tr></thead><tbody>
+{% for l in links %}<tr><td><a href="{% url 'tenancy:supplier_detail' l.supplier_id %}">{{ l.supplier.name }}</a></td><td>{{ l.supplier.country|country_name }}</td><td>{% for e in l.entities.all %}{{ e }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</td><td><span class="status status-{{ l.status }}">{{ l.get_status_display }}</span></td><td>{{ l.created_at|date:"j M Y" }}</td></tr>
+{% empty %}<tr><td colspan="5" class="empty">No suppliers have registered yet.</td></tr>{% endfor %}</tbody></table></div>
+{% if can_manage %}
+<h2>Supplier invitations</h2>
+<div class="table-wrap"><table><thead><tr><th>Supplier</th><th>Email</th><th>Entities</th><th>Status</th><th>Expires</th><th></th></tr></thead><tbody>
+{% for i in invitations %}<tr><td>{{ i.supplier_name }}</td><td>{{ i.email }}</td><td>{% for e in i.entities.all %}{{ e }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</td><td>{{ i.state|capfirst }}</td><td>{{ i.expires_at|date:"j M Y" }}</td>
+<td>{% if i.state == 'pending' %}<form method="post" action="{% url 'tenancy:supplier_invite_revoke' i.pk %}">{% csrf_token %}<button class="link-button">Revoke</button></form>{% endif %}</td></tr>
+{% empty %}<tr><td colspan="6" class="empty">No invitations sent.</td></tr>{% endfor %}</tbody></table></div>
+<h2>Client users</h2>
+<ul class="plain">{% for u in users %}<li>{{ u.full_name }} — {{ u.email }} ({{ u.get_role_display }})</li>{% empty %}<li class="empty">No users have accepted an invitation yet.</li>{% endfor %}</ul>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}{% load gateway %}
+{% block content %}
+{% if not is_own %}<nav class="crumbs" aria-label="Breadcrumb"><a href="{% url 'tenancy:supplier_list' %}">Suppliers</a> / {{ supplier.name }}</nav>{% endif %}
+<div class="page-head"><h1>{{ supplier.name }}</h1>{% if is_own and user.role == 'supplier_admin' %}<div class="btn-row"><a class="btn btn-secondary" href="{% url 'tenancy:my_supplier_edit' %}">Edit profile</a><a class="btn btn-secondary" href="{% url 'tenancy:factory_create' %}">Add factory</a></div>{% endif %}</div>
+<dl class="facts">
+  <div><dt>Status</dt><dd><span class="status status-{{ supplier.status }}">{{ supplier.get_status_display }}</span></dd></div>
+  <div><dt>Country</dt><dd>{{ supplier.country|country_name }}</dd></div>
+  <div><dt>Company no.</dt><dd>{{ supplier.company_number|dash }}</dd></div>
+  <div><dt>VAT</dt><dd>{{ supplier.vat_number|dash }}</dd></div>
+  <div><dt>EORI</dt><dd>{{ supplier.eori_number|dash }}</dd></div>
+  <div><dt>Contact</dt><dd>{{ supplier.contact_name }}<br><small>{{ supplier.contact_email }}</small></dd></div>
+  <div><dt>EUDR contact</dt><dd>{{ supplier.eudr_contact_name|dash }}{% if supplier.eudr_contact_email %}<br><small>{{ supplier.eudr_contact_email }}</small>{% endif %}</dd></div>
+  <div class="wide"><dt>Address</dt><dd>{{ supplier.address|linebreaksbr }}</dd></div>
+</dl>
+<h2>Customers</h2>
+<ul class="plain">{% for l in links %}<li>{{ l.client }} — {% for e in l.entities.all %}{{ e }}{% if not forloop.last %}, {% endif %}{% empty %}no entity assigned{% endfor %} <span class="status status-{{ l.status }}">{{ l.get_status_display }}</span></li>{% endfor %}</ul>
+{% if factories %}<h2>Factories</h2><ul class="plain">{% for f in factories %}<li>{{ f.name }}, {{ f.country|country_name }}</li>{% endfor %}</ul>{% endif %}
+<h2>Products</h2>
+{% include "supply/_product_table.html" %}
+<h2>Source locations</h2>
+{% include "supply/_plot_table.html" %}
+<h2>Producers</h2>
+<ul class="plain">{% for p in producers %}<li><a href="{% url 'supply:producer_detail' p.pk %}">{{ p.name }}</a>, {{ p.country|country_name }}</li>{% empty %}<li class="empty">None visible.</li>{% endfor %}</ul>
+{% endblock %}

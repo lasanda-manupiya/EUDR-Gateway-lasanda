@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% load gateway %}
+{% block content %}
+<div class="auth">
+  <p class="brand brand-lg"><span class="brand-mark" aria-hidden="true"></span>SustainZone <span class="brand-sub">EUDR Gateway</span></p>
+  <form method="post" class="panel form" novalidate>{% csrf_token %}
+    <h1>Sign in</h1>
+    {% include "includes/form_errors.html" %}
+    {% field form.username %}{% field form.password %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <div class="actions"><button class="btn" type="submit">Sign in</button></div>
+  </form>
+  <p class="muted small">Suppliers join by invitation from their customer or SustainZone.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Invitation sent</h1>
+<div class="panel">
+<p>An invitation email has been sent to <strong>{{ email }}</strong>.</p>
+<p>If email delivery is not configured yet, share this secure link directly. It is shown only once, can be used once, and expires automatically.</p>
+<div class="copy-row"><input type="text" readonly value="{{ link }}" id="invite-link" aria-label="Invitation link"><button type="button" class="btn" data-copy="#invite-link">Copy link</button></div>
+<p><a class="btn btn-secondary" href="{{ back }}">Done</a></p>
+</div>
+{% endblock %}

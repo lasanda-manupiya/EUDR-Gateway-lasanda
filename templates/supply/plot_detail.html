@@ -1,0 +1,28 @@
+{% extends "base.html" %}{% load gateway static %}
+{% block head %}{% include "supply/_map_assets.html" %}{% endblock %}
+{% block content %}
+<nav class="crumbs" aria-label="Breadcrumb">{% if not user.is_supplier_user %}<a href="{% url 'tenancy:supplier_detail' plot.supplier_id %}">{{ plot.supplier }}</a> / {% endif %}<a href="{% url 'supply:plot_list' %}">Source locations</a> / {{ plot.name }}</nav>
+<div class="page-head"><h1>{{ plot.name }}</h1><div class="btn-row"><a class="btn btn-secondary" href="{% url 'supply:plot_geojson' plot.pk %}?download=1">Download GeoJSON</a>{% if can_edit %}<a class="btn" href="{% url 'supply:plot_edit' plot.pk %}">Edit location</a>{% endif %}</div></div>
+<div class="map-layout">
+  <div id="plot-map" class="map" data-editable="0" data-area-ha="{{ plot.area_ha|default_if_none:''|stringformat:'s' }}" aria-label="Map of the source location"></div>
+  <aside class="map-info"><h3>Location summary</h3><div id="geom-summary"></div><details><summary>Coordinates</summary><div id="geom-coords"></div></details></aside>
+</div>
+{{ feature_collection|json_script:"plot-initial" }}
+<p class="notice">Geospatial screening (forest cover, forest change, land cover, country risk) is not connected yet. No screening result exists for this location. Screening, when added, supports the EUDR risk assessment but does not by itself determine legal compliance.</p>
+<dl class="facts">
+  <div><dt>Supplier</dt><dd>{{ plot.supplier }}</dd></div>
+  <div><dt>Plot reference</dt><dd>{{ plot.plot_reference|dash }}</dd></div>
+  <div><dt>Country</dt><dd>{{ plot.country|country_name }}</dd></div>
+  <div><dt>Producer</dt><dd>{% if plot.producer %}<a href="{% url 'supply:producer_detail' plot.producer_id %}">{{ plot.producer }}</a>{% else %}—{% endif %}</dd></div>
+  <div><dt>Location type</dt><dd>{{ plot.location_type }}</dd></div>
+  <div><dt>Area</dt><dd>{% if plot.area_ha is not None %}{{ plot.area_ha|floatformat:2 }} ha{% else %}—{% endif %}</dd></div>
+  <div><dt>Production period</dt><dd>{% if plot.production_start or plot.production_end %}{{ plot.production_start|date:"j M Y"|dash }} – {{ plot.production_end|date:"j M Y"|dash }}{% else %}<span class="muted">Not provided</span>{% endif %}</dd></div>
+  <div><dt>Harvest period</dt><dd>{% if plot.harvest_start or plot.harvest_end %}{{ plot.harvest_start|date:"j M Y"|dash }} – {{ plot.harvest_end|date:"j M Y"|dash }}{% else %}<span class="muted">Not provided</span>{% endif %}</dd></div>
+  <div><dt>Geometry captured</dt><dd>{{ plot.get_geometry_source_display|dash }}<br><small class="muted">{{ plot.geometry_updated_at|date:"j M Y H:i" }}</small></dd></div>
+  {% if user.is_supplier_user %}<div><dt>Shared with</dt><dd>{% for c in plot.clients.all %}{{ c }}{% if not forloop.last %}, {% endif %}{% empty %}<span class="status status-amber">No customers</span>{% endfor %}</dd></div>{% endif %}
+</dl>
+<h2>Products from this location</h2>
+{% with supplier=plot.supplier %}{% include "supply/_product_table.html" %}{% endwith %}
+{% with target="source_plot" obj_pk=plot.pk %}{% include "supply/_evidence.html" %}{% endwith %}
+{% endblock %}
+{% block scripts %}<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script><script src="{% static 'vendor/leaflet-draw/leaflet.draw.js' %}"></script><script src="{% static 'js/plot_map.js' %}"></script>{% endblock %}

@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head"><h1>Source locations</h1>{% if can_create %}<a class="btn" href="{% url 'supply:plot_create' %}">Add source location</a>{% endif %}</div>
+<form class="search" method="get"><label for="q" class="sr-only">Search source locations</label><input id="q" name="q" value="{{ q }}" placeholder="Name, plot reference, producer"><button class="btn btn-secondary">Search</button></form>
+{% include "supply/_plot_table.html" %}
+{% endblock %}

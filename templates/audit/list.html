@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Audit log</h1>
+<form class="search" method="get"><label for="action" class="sr-only">Filter by action</label><input id="action" name="action" value="{{ action }}" placeholder="Filter by action, e.g. source_plot"><button class="btn btn-secondary">Filter</button></form>
+<div class="table-wrap"><table class="dense"><thead><tr><th>When</th><th>User</th><th>Action</th><th>Record</th><th>Organisation</th><th>Change</th></tr></thead><tbody>
+{% for a in page %}<tr><td>{{ a.timestamp|date:"j M Y H:i:s" }}</td><td>{{ a.user_email|default:"—" }}<br><small class="muted">{{ a.user_role }}</small></td><td><code>{{ a.action }}</code></td><td>{{ a.object_repr }}<br><small class="muted">{{ a.object_type }} #{{ a.object_id }}</small></td><td>{{ a.client|default:"" }}{% if a.client and a.supplier %} / {% endif %}{{ a.supplier|default:"" }}</td>
+<td>{% if a.before or a.after %}<details><summary>View</summary>{% if a.before %}<p class="small">Before</p><pre>{{ a.before|pprint }}</pre>{% endif %}{% if a.after %}<p class="small">After</p><pre>{{ a.after|pprint }}</pre>{% endif %}</details>{% endif %}</td></tr>
+{% empty %}<tr><td colspan="6" class="empty">No entries.</td></tr>{% endfor %}</tbody></table></div>
+{% if page.has_other_pages %}<p class="pager">{% if page.has_previous %}<a href="?page={{ page.previous_page_number }}&action={{ action|urlencode }}">Newer</a>{% endif %} Page {{ page.number }} of {{ page.paginator.num_pages }} {% if page.has_next %}<a href="?page={{ page.next_page_number }}&action={{ action|urlencode }}">Older</a>{% endif %}</p>{% endif %}
+{% endblock %}

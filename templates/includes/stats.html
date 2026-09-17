@@ -1,0 +1,1 @@
+<dl class="stats">{% for label, value, url in stats %}<div><dt>{% if url %}<a href="{% url url %}">{{ label }}</a>{% else %}{{ label }}{% endif %}</dt><dd>{{ value }}</dd></div>{% endfor %}</dl>

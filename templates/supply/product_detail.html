@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% load gateway %}
+{% block content %}
+<nav class="crumbs" aria-label="Breadcrumb">{% if not user.is_supplier_user %}<a href="{% url 'tenancy:supplier_detail' product.supplier_id %}">{{ product.supplier }}</a> / {% endif %}<a href="{% url 'supply:product_list' %}">Products</a> / {{ product.name }}</nav>
+<div class="page-head"><h1>{{ product.name }}</h1>{% if can_edit %}<a class="btn btn-secondary" href="{% url 'supply:product_edit' product.pk %}">Edit</a>{% endif %}</div>
+<dl class="facts">
+  <div><dt>Commodity</dt><dd>{{ product.get_commodity_display }}</dd></div>
+  <div><dt>Product code</dt><dd>{{ product.product_code|dash }}</dd></div>
+  <div><dt>SKU</dt><dd>{{ product.sku|dash }}</dd></div>
+  <div><dt>HS code</dt><dd>{{ product.hs_code|dash }}</dd></div>
+  <div><dt>CN code</dt><dd>{{ product.cn_code|dash }}</dd></div>
+  <div><dt>Material</dt><dd>{{ product.material|dash }}</dd></div>
+  <div><dt>Species</dt><dd>{{ product.species_common|dash }}{% if product.species_scientific %}<br><i>{{ product.species_scientific }}</i>{% endif %}</dd></div>
+  <div><dt>Country of production</dt><dd>{{ product.country_of_production|country_name }}</dd></div>
+  <div><dt>Unit</dt><dd>{{ product.get_unit_display }}</dd></div>
+  {% if user.is_supplier_user %}<div><dt>Shared with</dt><dd>{% for c in product.clients.all %}{{ c }}{% if not forloop.last %}, {% endif %}{% empty %}<span class="status status-amber">No customers</span>{% endfor %}</dd></div>{% endif %}
+  {% if product.description %}<div class="wide"><dt>Description</dt><dd>{{ product.description|linebreaksbr }}</dd></div>{% endif %}
+</dl>
+<h2>Producers</h2>
+<ul class="plain">{% for p in producers %}<li><a href="{% url 'supply:producer_detail' p.pk %}">{{ p.name }}</a>, {{ p.country|country_name }}</li>{% empty %}<li class="empty">No producer linked.</li>{% endfor %}</ul>
+<h2>Source locations</h2>
+{% with supplier=product.supplier %}{% include "supply/_plot_table.html" %}{% endwith %}
+{% with target="product" obj_pk=product.pk %}{% include "supply/_evidence.html" %}{% endwith %}
+{% endblock %}

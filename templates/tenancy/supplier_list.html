@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% load gateway %}
+{% block content %}
+<h1>Suppliers</h1>
+<form class="search" method="get"><label for="q" class="sr-only">Search suppliers</label><input id="q" name="q" value="{{ q }}" placeholder="Search by supplier name"><button class="btn btn-secondary">Search</button></form>
+<div class="table-wrap"><table><thead><tr><th>Supplier</th><th>Country</th>{% if user.is_sz_admin %}<th>Client</th>{% endif %}<th>Entities</th><th>Relationship</th><th>EUDR contact</th></tr></thead><tbody>
+{% for l in links %}<tr><td><a href="{% url 'tenancy:supplier_detail' l.supplier_id %}">{{ l.supplier.name }}</a></td><td>{{ l.supplier.country|country_name }}</td>{% if user.is_sz_admin %}<td><a href="{% url 'tenancy:client_detail' l.client_id %}">{{ l.client }}</a></td>{% endif %}<td>{% for e in l.entities.all %}{{ e }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</td><td><span class="status status-{{ l.status }}">{{ l.get_status_display }}</span></td><td>{{ l.supplier.eudr_contact_name|dash }}</td></tr>
+{% empty %}<tr><td colspan="6" class="empty">No suppliers found.</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

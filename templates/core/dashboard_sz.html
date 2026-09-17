@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head"><h1>SustainZone overview</h1><a class="btn" href="{% url 'tenancy:client_create' %}">Create client company</a></div>
+<dl class="stats">
+  <div><dt><a href="{% url 'tenancy:client_list' %}">Client companies</a></dt><dd>{{ n_clients }}</dd></div>
+  <div><dt>Legal entities</dt><dd>{{ n_entities }}</dd></div>
+  <div><dt><a href="{% url 'tenancy:supplier_list' %}">Suppliers</a></dt><dd>{{ n_suppliers }}</dd></div>
+  <div><dt><a href="{% url 'supply:product_list' %}">Products</a></dt><dd>{{ n_products }}</dd></div>
+  <div><dt><a href="{% url 'supply:plot_list' %}">Source locations</a></dt><dd>{{ n_plots }}</dd></div>
+</dl>
+<p class="notice">Case filtering, exception queue, DDS register and geospatial screening are later build stages and are not active yet.</p>
+<div class="grid-2">
+<section><h2>Clients</h2><div class="table-wrap"><table><thead><tr><th>Client</th><th>Status</th><th class="num">Entities</th><th class="num">Suppliers</th></tr></thead><tbody>
+{% for c in clients %}<tr><td><a href="{% url 'tenancy:client_detail' c.pk %}">{{ c.name }}</a></td><td><span class="status status-{{ c.status }}">{{ c.get_status_display }}</span></td><td class="num">{{ c.n_entities }}</td><td class="num">{{ c.n_suppliers }}</td></tr>
+{% empty %}<tr><td colspan="4" class="empty">No clients yet.</td></tr>{% endfor %}</tbody></table></div>
+<h2>Pending supplier invitations</h2><div class="table-wrap"><table><thead><tr><th>Supplier</th><th>Client</th><th>Sent</th></tr></thead><tbody>
+{% for i in pending_invites %}<tr><td>{{ i.supplier_name }}<br><small class="muted">{{ i.email }}</small></td><td>{{ i.client }}</td><td>{{ i.created_at|date:"j M Y" }}</td></tr>
+{% empty %}<tr><td colspan="3" class="empty">None pending.</td></tr>{% endfor %}</tbody></table></div></section>
+<section><h2>Recent activity</h2><ol class="activity">{% for a in recent %}<li><time>{{ a.timestamp|date:"j M H:i" }}</time> <span>{{ a.user_email|default:"System" }}</span> <code>{{ a.action }}</code> {{ a.object_repr }}{% if a.client %} <small class="muted">({{ a.client }})</small>{% endif %}</li>{% empty %}<li class="empty">No activity yet.</li>{% endfor %}</ol>
+<p><a href="{% url 'audit:list' %}">Full audit log</a></p></section>
+</div>
+{% endblock %}

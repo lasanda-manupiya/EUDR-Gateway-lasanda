@@ -1,0 +1,6 @@
+<div class="field{% if f.errors %} has-error{% endif %}{% if f.field.widget.input_type == 'checkbox' %} field-check{% endif %}">
+  {% if f.field.widget.input_type != 'hidden' %}<label for="{{ f.id_for_label }}">{{ f.label }}{% if f.field.required %} <span class="req" aria-label="required">*</span>{% endif %}</label>{% endif %}
+  {{ f }}
+  {% if f.help_text %}<p class="help">{{ f.help_text }}</p>{% endif %}
+  {% for e in f.errors %}<p class="error">{{ e }}</p>{% endfor %}
+</div>

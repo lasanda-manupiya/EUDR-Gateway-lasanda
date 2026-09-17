@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% load gateway %}
+{% block content %}
+<div class="auth">
+<form method="post" class="panel form" novalidate>{% csrf_token %}
+  <h1>Join {{ org }}</h1>
+  <p class="lede">You have been invited as <strong>{{ inv.get_role_display }}</strong>.</p>
+  {% include "includes/form_errors.html" %}
+  {% for f in form %}{% field f %}{% endfor %}
+  <div class="actions"><button class="btn" type="submit">Create account</button></div>
+</form></div>
+{% endblock %}

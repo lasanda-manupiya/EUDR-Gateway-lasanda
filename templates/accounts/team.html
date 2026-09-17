@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head"><h1>Team</h1>{% if can_invite %}<a class="btn" href="{% url 'accounts:invite_user' %}">Invite team member</a>{% endif %}</div>
+<div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Entities</th><th>Last sign-in</th></tr></thead><tbody>
+{% for m in members %}<tr><td>{{ m.full_name }}</td><td>{{ m.email }}</td><td>{{ m.get_role_display }}</td><td>{% for e in m.permitted_entities.all %}{{ e }}{% if not forloop.last %}, {% endif %}{% empty %}{% if m.role == 'client_entity_user' %}None{% else %}All{% endif %}{% endfor %}</td><td>{{ m.last_login|date:"j M Y H:i"|default:"Never" }}</td></tr>{% endfor %}
+</tbody></table></div>
+{% if invites %}<h2>Invitations</h2><div class="table-wrap"><table><thead><tr><th>Email</th><th>Role</th><th>Status</th><th>Expires</th><th></th></tr></thead><tbody>
+{% for i in invites %}<tr><td>{{ i.email }}</td><td>{{ i.get_role_display }}</td><td>{{ i.state|capfirst }}</td><td>{{ i.expires_at|date:"j M Y" }}</td>
+<td>{% if i.state == 'pending' %}<form method="post" action="{% url 'accounts:revoke_invite' i.pk %}">{% csrf_token %}<button class="link-button" type="submit">Revoke</button></form>{% endif %}</td></tr>{% endfor %}
+</tbody></table></div>{% endif %}
+{% endblock %}

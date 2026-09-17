@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% load gateway %}
+{% block content %}
+<div class="narrow">
+<p class="brand brand-lg"><span class="brand-mark" aria-hidden="true"></span>SustainZone <span class="brand-sub">EUDR Gateway</span></p>
+<h1>Register {{ inv.supplier_name }}</h1>
+<p class="lede"><strong>{{ inv.client }}</strong> has asked you to provide information under the EU Deforestation Regulation (EUDR). You register your company once. After that you can reuse your products and source locations for every order, and connect to other customers without registering again.</p>
+<p class="muted small">Already registered for another customer? <a href="{% url 'accounts:login' %}?next={% url 'tenancy:supplier_accept' token %}">Sign in</a> to connect instead.</p>
+<form method="post" class="form" novalidate>{% csrf_token %}
+  {% if company_form.errors or account_form.errors %}<p class="msg msg-error">Please correct the highlighted items.</p>{% endif %}
+  <fieldset class="panel"><legend>Step 1 of 2 — Your company</legend>{% for f in company_form %}{% field f %}{% endfor %}</fieldset>
+  <fieldset class="panel"><legend>Step 2 of 2 — Your user account</legend><p class="help">You will be the administrator for your company and can add colleagues later.</p>{% for f in account_form %}{% field f %}{% endfor %}</fieldset>
+  <div class="actions"><button class="btn" type="submit">Complete registration</button></div>
+</form>
+</div>
+{% endblock %}

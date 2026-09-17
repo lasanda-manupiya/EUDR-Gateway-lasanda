@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head"><h1>{{ client.name }}</h1>{% if user.role == 'client_admin' %}<a class="btn" href="{% url 'tenancy:supplier_invite' client.pk %}">Invite supplier</a>{% endif %}</div>
+<dl class="stats">
+  <div><dt>Legal entities</dt><dd>{{ entities|length }}</dd></div>
+  <div><dt><a href="{% url 'tenancy:supplier_list' %}">Suppliers</a></dt><dd>{{ n_suppliers }}</dd></div>
+  <div><dt><a href="{% url 'supply:product_list' %}">Products shared with you</a></dt><dd>{{ n_products }}</dd></div>
+  <div><dt><a href="{% url 'supply:plot_list' %}">Source locations</a></dt><dd>{{ n_plots }}</dd></div>
+</dl>
+<p class="notice">PO EUDR statuses (Ready / Review / Hold) will appear here once the purchase order workflow stage is built.</p>
+<h2>Supplier readiness</h2>
+<div class="table-wrap"><table><thead><tr><th>Supplier</th><th>Entities</th><th class="num">Products</th><th class="num">Source locations</th><th>Attention</th></tr></thead><tbody>
+{% for s in suppliers %}<tr><td><a href="{% url 'tenancy:supplier_detail' s.link.supplier_id %}">{{ s.link.supplier.name }}</a></td>
+<td>{% for e in s.link.entities.all %}{{ e }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</td>
+<td class="num">{{ s.products }}</td><td class="num">{{ s.plots }}</td>
+<td>{% if not s.products %}<span class="status status-amber">No products yet</span>{% elif not s.plots %}<span class="status status-amber">No source locations</span>{% elif s.plots_missing_products %}<span class="status status-amber">{{ s.plots_missing_products }} location{{ s.plots_missing_products|pluralize }} not linked to a product</span>{% else %}<span class="status status-green">Registration data present</span>{% endif %}</td></tr>
+{% empty %}<tr><td colspan="5" class="empty">No suppliers connected yet.</td></tr>{% endfor %}</tbody></table></div>
+{% if pending_invites %}<h2>Invitations awaiting registration</h2><ul class="plain">{% for i in pending_invites %}<li>{{ i.supplier_name }} — {{ i.email }}, sent {{ i.created_at|date:"j M Y" }}</li>{% endfor %}</ul>{% endif %}
+{% endblock %}

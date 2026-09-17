@@ -1,0 +1,17 @@
+{% extends "base.html" %}{% load gateway %}
+{% block content %}
+<nav class="crumbs" aria-label="Breadcrumb"><a href="{% url 'tenancy:client_detail' entity.client_id %}">{{ entity.client }}</a> / {{ entity.name }}</nav>
+<div class="page-head"><h1>{{ entity.name }}</h1>{% if can_manage %}<a class="btn btn-secondary" href="{% url 'tenancy:entity_edit' entity.pk %}">Edit</a>{% endif %}</div>
+<dl class="facts">
+  <div><dt>Country</dt><dd>{{ entity.country|country_name }}</dd></div>
+  <div><dt>EUDR role</dt><dd>{{ entity.get_eudr_role_display }}</dd></div>
+  <div><dt>Registration no.</dt><dd>{{ entity.registration_number|dash }}</dd></div>
+  <div><dt>VAT</dt><dd>{{ entity.vat_number|dash }}</dd></div>
+  <div><dt>EORI</dt><dd>{{ entity.eori_number|dash }}</dd></div>
+  <div><dt>TRACES reference</dt><dd>{{ entity.traces_operator_reference|dash }}<br><small class="muted">Manually recorded</small></dd></div>
+  <div><dt>Contact</dt><dd>{{ entity.contact_name|dash }}{% if entity.contact_email %}<br><small>{{ entity.contact_email }}</small>{% endif %}</dd></div>
+  <div class="wide"><dt>Address</dt><dd>{{ entity.address|linebreaksbr }}</dd></div>
+</dl>
+<h2>Suppliers for this entity</h2>
+<ul class="plain">{% for l in links %}<li><a href="{% url 'tenancy:supplier_detail' l.supplier_id %}">{{ l.supplier.name }}</a></li>{% empty %}<li class="empty">No suppliers assigned to this entity.</li>{% endfor %}</ul>
+{% endblock %}

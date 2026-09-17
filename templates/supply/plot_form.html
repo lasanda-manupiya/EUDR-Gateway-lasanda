@@ -1,0 +1,41 @@
+{% extends "base.html" %}{% load gateway static %}
+{% block head %}{% include "supply/_map_assets.html" %}{% endblock %}
+{% block content %}
+<nav class="crumbs" aria-label="Breadcrumb"><a href="{% url 'supply:plot_list' %}">Source locations</a> / {% if plot %}{{ plot.name }}{% else %}New{% endif %}</nav>
+<h1>{% if plot %}Edit source location{% else %}Add a source location{% endif %}</h1>
+<p class="lede">This is where the raw material was <strong>grown or harvested</strong> — the forest, farm or plantation. It is <em>not</em> your office, warehouse or factory address.</p>
+<form method="post" class="form" novalidate id="plot-form">{% csrf_token %}
+{% include "includes/form_errors.html" %}
+<section class="panel">
+  <h2>Where is it?</h2>
+  <p class="help">Choose one way to show the area. Most suppliers draw it on the map. If the producer gave you a file (GeoJSON), upload it instead. For small plots (4 hectares or less) a single point can be enough; larger plots need the outline.</p>
+  <div class="map-tools" role="group" aria-label="Ways to add the location">
+    <details open><summary>Draw on the map</summary><p class="help">Use the pentagon tool on the map to click around the edge of the area, then click the first point to finish. Use the edit tool to move corners, or the bin to remove a shape. You can draw several separate areas.</p></details>
+    <details><summary>Upload a GeoJSON file</summary><p class="help">A GeoJSON file ends in <code>.geojson</code> or <code>.json</code>. Producers, forestry agencies and mapping apps can usually export one.</p><input type="file" id="geojson-file" accept=".geojson,.json,application/geo+json,application/json"></details>
+    <details><summary>Paste GeoJSON</summary><textarea id="geojson-paste" rows="4" placeholder='{"type": "Polygon", "coordinates": [[[lon, lat], ...]]}'></textarea><button type="button" class="btn btn-secondary" id="load-pasted">Show on map</button></details>
+    <details><summary>Enter point coordinates</summary><p class="help">Decimal degrees. Example: latitude 50.9380, longitude 6.9570. Tip: in Google Maps, right-click a location to copy its coordinates.</p>
+      <div class="inline-fields"><label>Latitude <input type="number" step="any" id="point-lat" min="-90" max="90"></label><label>Longitude <input type="number" step="any" id="point-lng" min="-180" max="180"></label><button type="button" class="btn btn-secondary" id="place-point">Place point</button></div></details>
+  </div>
+  <p class="map-error" id="map-error" role="alert" hidden></p>
+  {% for e in form.geometry_geojson.errors %}<p class="error">{{ e }}</p>{% endfor %}
+  <div class="map-layout">
+    <div id="plot-map" class="map" data-editable="1" aria-label="Interactive map for the source location"></div>
+    <aside class="map-info" aria-live="polite"><h3>Location summary</h3><div id="geom-summary"><p class="muted">Nothing drawn yet.</p></div><details><summary>Coordinates</summary><div id="geom-coords"></div></details></aside>
+  </div>
+  {{ form.geometry_geojson }}
+  <input type="hidden" name="geometry_origin" id="geometry-origin" value="">
+  {{ form.geometry_geojson.value|json_script:"plot-initial" }}
+</section>
+<section class="panel">
+  <h2>About this location</h2>
+  {% field form.name %}{% field form.plot_reference %}{% field form.country %}{% field form.producer %}
+  <p class="help">Producer missing? <a href="{% url 'supply:producer_create' %}" target="_blank" rel="noopener">Register it in a new tab</a>, then reload this page.</p>
+  {% field form.products %}
+  <div class="inline-fields">{% field form.production_start %}{% field form.production_end %}</div>
+  <div class="inline-fields">{% field form.harvest_start %}{% field form.harvest_end %}</div>
+  {% field form.description %}{% field form.clients %}
+</section>
+<div class="actions"><button class="btn" type="submit">Save source location</button><a class="btn btn-secondary" href="{% if plot %}{% url 'supply:plot_detail' plot.pk %}{% else %}{% url 'supply:plot_list' %}{% endif %}">Cancel</a></div>
+</form>
+{% endblock %}
+{% block scripts %}<script src="{% static 'vendor/leaflet/leaflet.js' %}"></script><script src="{% static 'vendor/leaflet-draw/leaflet.draw.js' %}"></script><script src="{% static 'js/plot_map.js' %}"></script>{% endblock %}

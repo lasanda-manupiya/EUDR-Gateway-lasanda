@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+private_media/
+staticfiles/
+e2e-screenshots/
+.venv/

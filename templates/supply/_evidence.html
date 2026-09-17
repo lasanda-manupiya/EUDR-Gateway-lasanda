@@ -1,0 +1,5 @@
+<h2>Evidence</h2>
+{% if can_upload %}<p><a class="btn btn-secondary" href="{% url 'supply:evidence_upload' target obj_pk %}">Upload evidence</a></p>{% endif %}
+<div class="table-wrap"><table><thead><tr><th>File</th><th>Category</th><th>Description</th><th class="num">Size</th><th>Uploaded</th></tr></thead><tbody>
+{% for e in evidence %}<tr><td><a href="{% url 'supply:evidence_download' e.pk %}">{{ e.original_name }}</a></td><td>{{ e.get_category_display }}</td><td>{{ e.description|default:"—" }}</td><td class="num">{{ e.size_bytes|filesizeformat }}</td><td>{{ e.uploaded_at|date:"j M Y" }}</td></tr>
+{% empty %}<tr><td colspan="5" class="empty">No evidence uploaded.</td></tr>{% endfor %}</tbody></table></div>

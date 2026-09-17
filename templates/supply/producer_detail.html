@@ -1,0 +1,15 @@
+{% extends "base.html" %}{% load gateway %}
+{% block content %}
+<nav class="crumbs" aria-label="Breadcrumb"><a href="{% url 'supply:producer_list' %}">Producers</a> / {{ producer.name }}</nav>
+<div class="page-head"><h1>{{ producer.name }}</h1>{% if can_edit %}<a class="btn btn-secondary" href="{% url 'supply:producer_edit' producer.pk %}">Edit</a>{% endif %}</div>
+<dl class="facts">
+  <div><dt>Country</dt><dd>{{ producer.country|country_name }}</dd></div>
+  <div><dt>Registration</dt><dd>{{ producer.registration_number|dash }}</dd></div>
+  <div class="wide"><dt>Address</dt><dd>{{ producer.address|linebreaksbr|dash }}</dd></div>
+  {% if producer.notes %}<div class="wide"><dt>Notes</dt><dd>{{ producer.notes|linebreaksbr }}</dd></div>{% endif %}
+</dl>
+<h2>Suppliers</h2><ul class="plain">{% for s in suppliers %}<li>{{ s }}</li>{% endfor %}</ul>
+<h2>Products</h2>{% include "supply/_product_table.html" %}
+<h2>Source locations</h2>{% include "supply/_plot_table.html" %}
+{% with target="producer" obj_pk=producer.pk %}{% include "supply/_evidence.html" %}{% endwith %}
+{% endblock %}

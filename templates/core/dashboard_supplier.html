@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ user.supplier.name }}</h1>
+<p class="lede">Connected customers: {% for c in clients %}{{ c.name }}{% if not forloop.last %}, {% endif %}{% empty %}none yet{% endfor %}.</p>
+{% if todo %}
+<section class="panel steps"><h2>Getting started</h2>
+<p>Register this information once. It will be reused for every order, so you will not be asked for it again.</p>
+<ol>{% for label, url in todo %}<li><a href="{% url url %}">{{ label }}</a></li>{% endfor %}</ol></section>
+{% endif %}
+<dl class="stats">
+  <div><dt><a href="{% url 'supply:producer_list' %}">Producers</a></dt><dd>{{ n_producers }}</dd></div>
+  <div><dt><a href="{% url 'supply:product_list' %}">Products</a></dt><dd>{{ n_products }}</dd></div>
+  <div><dt><a href="{% url 'supply:plot_list' %}">Source locations</a></dt><dd>{{ n_plots }}</dd></div>
+</dl>
+<h2>Needs attention</h2>
+<ul class="attention">
+{% for p in products_without_source %}<li><a href="{% url 'supply:product_detail' p.pk %}">{{ p }}</a> has no source location linked. <a href="{% url 'supply:plot_create' %}">Add one</a></li>{% endfor %}
+{% for p in products_not_shared %}<li><a href="{% url 'supply:product_edit' p.pk %}">{{ p }}</a> is not shared with any customer.</li>{% endfor %}
+{% for p in products_missing_species %}<li><a href="{% url 'supply:product_edit' p.pk %}">{{ p }}</a> is a wood product without a scientific species name.</li>{% endfor %}
+{% for s in plots_without_product %}<li><a href="{% url 'supply:plot_edit' s.pk %}">{{ s }}</a> is not linked to any product.</li>{% endfor %}
+{% if not products_without_source and not products_not_shared and not products_missing_species and not plots_without_product %}<li class="empty">Nothing outstanding.</li>{% endif %}
+</ul>
+<p class="notice">Purchase order requests from your customers will appear here once that stage is built.</p>
+{% endblock %}

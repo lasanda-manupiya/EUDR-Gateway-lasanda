@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-head"><h1>Products</h1>{% if can_create %}<a class="btn" href="{% url 'supply:product_create' %}">Register product</a>{% endif %}</div>
+<form class="search" method="get"><label for="q" class="sr-only">Search products</label><input id="q" name="q" value="{{ q }}" placeholder="Name, SKU, CN or HS code, species"><button class="btn btn-secondary">Search</button></form>
+{% include "supply/_product_table.html" %}
+{% endblock %}

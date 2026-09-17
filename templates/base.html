@@ -1,0 +1,30 @@
+{% load static %}<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}SustainZone EUDR Gateway{% endblock %}</title>
+<link rel="icon" href="{% static 'favicon.svg' %}" type="image/svg+xml">
+<link rel="stylesheet" href="{% static 'css/app.css' %}">
+{% block head %}{% endblock %}
+</head>
+<body class="{% if user.is_authenticated %}with-nav{% else %}bare{% endif %}">
+{% if user.is_authenticated %}
+<header class="topbar">
+  <button class="nav-toggle" type="button" aria-controls="sidenav" aria-expanded="false" id="nav-toggle">Menu</button>
+  <a class="brand" href="{% url 'core:dashboard' %}"><span class="brand-mark" aria-hidden="true"></span>SustainZone <span class="brand-sub">EUDR Gateway</span></a>
+  <div class="whoami"><span>{{ user.full_name }}</span><small>{{ user.get_role_display }} · {{ user.organisation_label }}</small>
+    <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="link-button" type="submit">Sign out</button></form>
+  </div>
+</header>
+<nav class="sidenav" id="sidenav" aria-label="Main">
+  <ul>{% for name, label in nav_items %}<li><a href="{% url name %}" {% if request.resolver_match.view_name == name %}aria-current="page"{% endif %}>{{ label }}</a></li>{% endfor %}</ul>
+</nav>
+{% endif %}
+<main class="content">
+  {% if messages %}<div class="messages">{% for m in messages %}<p class="msg msg-{{ m.tags }}" role="status">{{ m }}</p>{% endfor %}</div>{% endif %}
+  {% block content %}{% endblock %}
+</main>
+<script src="{% static 'js/app.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
